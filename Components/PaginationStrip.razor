@@ -1,0 +1,105 @@
+﻿@inherits InputSelect<int>
+<style>
+    a {
+        cursor: pointer;
+    }
+    .page-link {
+        color: black;
+        display: unset;
+        margin-left: 0.3rem;
+        border-radius: 0.75rem !important;
+    }
+    .page-item.active .page-link {
+        z-index: 3;
+        color: #fff;
+        background-color: #00A82D;
+        border-color: #00A82D;
+    }
+    .page-link:hover {
+        color: #00A82D !important;
+        border-color: #00A82D !important;
+    }
+</style>
+@{
+    int n = 4;
+    List<int> all = new List<int>(TotalPages);
+    for (int i = 1; i <= TotalPages; i++)
+    {
+        if (i != Value)
+            all.Add(i);
+    }
+
+    List<int> pages = new List<int>(n);
+    pages.Add(Value);
+    for (int i = 1; i <= n / 2; i++)
+    {
+        var u = all.FirstOrDefault(x => x > Value);
+        if (u > 0)
+        {
+            pages.Add(u);
+            all.Remove(u);
+        }
+        else
+        {
+            var l = all.LastOrDefault(x => x < Value);
+            if (l > 0)
+            {
+                pages.Add(l);
+                all.Remove(l);
+            }
+        }
+
+
+        var u1 = all.LastOrDefault(x => x < Value);
+        if (u1 > 0)
+        {
+            pages.Add(u1);
+            all.Remove(u1);
+        }
+        else
+        {
+            var l1 = all.FirstOrDefault(x => x > Value);
+            if (l1 > 0)
+            {
+                pages.Add(l1);
+                all.Remove(l1);
+            }
+        }
+        pages.Sort();
+    }
+}
+@if (TotalPages > 1)
+{
+    
+<div class="card-footer clearfix mt-2 bg-transparent">
+    <ul class="pagination pagination-md m-0 float-right">
+
+        <li class="page-item">
+            <a @onclick="() => UpdatePage(Math.Max(1, 1) )" class="page-link btn-sm"><i class="fas fa-angle-double-left"></i></a>
+        </li>
+        <li class="page-item">
+            <a @onclick="() => UpdatePage(Math.Max(Value - 1, 1) )" class="page-link btn-sm"><i class="fas fa-angle-left"></i></a>
+        </li>
+        @foreach (int i in pages)
+        {
+            int c = i;
+            var activeClass = Value == c ? "active" : null;
+            <li class="page-item @activeClass">
+                <a href="javascript:void(0)" @onclick="() => UpdatePage(c )" class="page-link btn-sm ">@c</a>
+            </li>
+        }
+        <li class="page-item">
+            <a @onclick="() => UpdatePage(Math.Min(Value + 1, TotalPages) )" class="page-link btn-sm"><i class="fas fa-angle-right"></i></a>
+        </li> 
+        <li class="page-item">
+            <a @onclick="() => UpdatePage(Math.Min(TotalPages, TotalPages) )" class="page-link btn-sm"><i class="fas fa-angle-double-right"></i></a>
+        </li>
+
+    </ul>
+        <div class="float-left">
+        <span class="text-muted"> @TotalRows records</span>
+    </div>
+</div>
+       
+   
+}

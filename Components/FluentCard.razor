@@ -1,0 +1,146 @@
+﻿<style>
+    .export-btn {
+        background-color: #B4BCC9;
+        opacity: 50%;
+    }
+
+    .content-wrapper > .content {
+        padding: 1rem;
+    }
+    .item-left{
+        float:left;
+    }
+    .b1{
+        background-color:#309BB1;
+    }   
+    .b1:hover{
+            background-color: #20B2AA;
+    }
+</style>
+
+<div class="card" style="margin-left:15px; margin-right:15px; border-radius:30px;
+
+    -webkit-box-shadow: 1px -15px 22px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 1px -15px 22px 0px rgba(0,0,0,0.75);
+   box-shadow: 1px -15px 22px 0px rgba(0,0,0,0.10);">
+    <div class="content" id="FluentCard">
+        <div class="card-header"><strong><h4>@Title</h4></strong></div>
+        <div class="d-flex">
+            <div class="p-5 w-50">
+                <h4 class="float-left">@SubTitle</h4>
+            </div>
+            <div class="p-5 w-50">
+                @if (!HideSearch)
+                {
+                    <Search SearchString="Search"></Search>
+                }
+            </div> 
+            <div class="p-5 w-50">
+                @if (AddButtonHeading != null)
+                {
+                    <div class="float-right">
+                        <button class="b1 btn bg-bg1 btn-sm mr-5 text-white" @onclick="async () => await AddButtonClicked.InvokeAsync()">
+                            @AddButtonHeading
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+        @* <div class="row d-flex">
+            <div class="my-3 justify-content-start">
+                <h4 class="float-left font-weight-bold">@Title</h4>
+            </div>
+            <div class="my-3 justify-content-end">
+                <div class="item-left" style="margin-left: 38px; margin-top: 14px;" >
+                    @if (!HideSearch)
+                    {
+                        <Search SearchString="Search"></Search>
+                    }
+                </div>
+                @if (AddButtonHeading != null)
+                {
+                    <div class="float-right">
+                        <button class="btn bg-bg1 btn-sm btn-primary text-white" style=" margin-top: 14px; margin-left: 561px;" @onclick="async () => await AddButtonClicked.InvokeAsync()">
+                            @AddButtonHeading
+                        </button>
+                    </div>
+                }
+            </div>
+        </div> *@
+
+        <div class="card @(IsBusy ? "overlay overlay-block rounded" : "")">
+            <div class="card-body @(IsBusy ? "overlay-wrapper" : "")" style="min-height:80vh;">
+
+
+                @if (!NoItems)
+                {
+                    if (ShowExports)
+                    {
+                        <div class="row">
+                            <div class="float-left">
+                                <a class="btn export-btn ml-2" title="Export Excel" @onclick='async ()=>await ExportClick.InvokeAsync("Excel")'>Excel</a>
+                                <a class="btn export-btn ml-2" title="Export PDF" @onclick='async ()=>await ExportClick.InvokeAsync("Pdf")'>PDF</a>
+                                <a class="btn export-btn ml-2" title="Export CSV" @onclick='async ()=>await ExportClick.InvokeAsync("Csv")'>CSV</a>
+                            </div>
+                        </div>
+                    }
+                }
+
+                @if (IsBusy)
+                {
+                    <div class="overlay-layer rounded bg-primary-o-20">
+                        <div class="spinner spinner-lg spinner-center spinner-success"></div>
+                    </div>
+                }
+                <div style="overflow-x:hidden;">
+                    @this.ChildContent
+                </div>
+                @if (NoItems && !IsBusy && AddButtonHeading != null)
+                {
+                    <div class="d-flex align-items-center justify-content-center mt-5">
+                        <button class="btn bg-bg1 btn-primary text-white" @onclick="async ()=>await AddButtonClicked.InvokeAsync()">@AddButtonHeading.Replace("New", " First")</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string SubTitle { get; set; }
+
+    [Parameter]
+    public string AddButtonHeading { get; set; } = null;
+
+    [Parameter]
+    public EventCallback AddButtonClicked { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SearchString { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ExportClick { get; set; }
+
+    [Parameter]
+    public bool HideSearch { get; set; } = false;
+
+    [Parameter]
+    public bool NoItems { get; set; } = true; 
+    [Parameter]
+    public bool ShowExports { get; set; } = true;
+
+    public async Task Search(string searchKey)
+    {
+        await SearchString.InvokeAsync(searchKey);
+    }
+}
